@@ -1,0 +1,41 @@
+name: Run Playwright Tests and Generate Report
+
+on:
+  push:
+    branches:
+      - main  # Trigger the action when pushing to the `main` branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull request to `main` branch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Set up Node.js (Playwright needs it)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'  # Choose the version of Node.js you are using
+
+      # Install dependencies, including Playwright
+      - name: Install Dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps  # Install Playwright and its dependencies
+
+      # Run Playwright Tests
+      - name: Run Playwright Tests
+        run: npx playwright test
+
+      # Upload the generated HTML report as an artifact
+      - name: Upload HTML Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: playwright-report/
